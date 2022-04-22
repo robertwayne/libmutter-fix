@@ -9,21 +9,23 @@ def main():
     # create a temporary directory
     Path(Path.home() / "mutter").mkdir(parents=True, exist_ok=True)
 
-    # # grab latest source code
+    # grab latest source code
     cwd = Path(Path.home() / "mutter")
     subprocess.run("apt source mutter", shell=True, cwd=cwd)
     subprocess.run("sudo apt build-dep mutter", shell=True, cwd=cwd)
 
-    # # we need to grab a file from within the mutter source code now
-    # # we assume that mutter will start with `mutter-` and be the only file
-    # # that does in this directory. This could very easily breat.
+    # we need to grab a file from within the mutter source code now
+    # we assume that mutter will start with `mutter-` and be the only file
+    # that does in this directory. This could very easily breat.
     raw_output = subprocess.check_output("ls | grep mutter-", shell=True, cwd=cwd)
     output = raw_output.decode("utf-8").strip()
+
+    # sets the version of libmutter we will be working with
     libmutter_version = output.split("-")[1]
 
     cwd = Path(Path.home() / "mutter" / output)
 
-    # # now we need to grab the source file
+    # now we need to grab the source file
     lines = []
     offending_line = 0
     with open(cwd / "src/backends/x11/meta-backend-x11.c", "r+") as f:
@@ -34,14 +36,14 @@ def main():
             offending_line = i
             break
 
-    # # now we need to replace the offending line with the following
+    # now we need to replace the offending line with the following
     lines[offending_line] = ""
     with open(cwd / "src/backends/x11/meta-backend-x11.c", "w+") as f:
         f.writelines(lines)
 
-    # # we will now build from source
-    # # we skip tests because they seem to fail (can't grab a wayland communication bus from the 
-    # # subprocess.run command)
+    # we will now build from source
+    # we skip tests because they seem to fail (can't grab a wayland communication bus from the 
+    # subprocess.run command)
     subprocess.run("DEB_BUILD_OPTIONS=nocheck dpkg-buildpackage -rfakeroot -uc -b", shell=True, cwd=cwd)
 
     # we have to figure out which file is the release .deb file now
@@ -53,8 +55,10 @@ def main():
     deb = ""
     for file in output:
         if file.endswith(".deb") and file.startswith("libmutter-") and ("dbg" not in file):
-            deb = file
+            # sets the package name we will use later
             libmutter_name = file.split("_")[0]
+
+            deb = file
             break
     
     # now we will install the .deb file
@@ -67,5 +71,5 @@ def main():
     cwd = Path.home()
     subprocess.run(f"rm -rf mutter", shell=True, cwd=cwd)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
