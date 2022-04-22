@@ -20,9 +20,9 @@ Additional threads found during my research on this bug:
 
 ## Usage
 
-1. python libmutter-fix.py
+Must be on a Debian-based distro. This was made and tested on Pop_OS!.
 
-2. Reboot
+Run `python libmutter-fix.py`, then reboot.
 
 ## How do I know if it worked?
 
