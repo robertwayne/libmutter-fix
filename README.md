@@ -29,3 +29,7 @@ Run `python libmutter-fix.py`, then reboot.
 You can use `xdotool key q` as a quick way to see if you suffer from the lag. Your system should lock up for a noticable amount before posting the key.
 
 Run this command again after applying the fix and rebooting, and there should be no more system freeze.
+
+## Tested On
+- Pop_OS 21.xx
+- Pop_OS 22.04
